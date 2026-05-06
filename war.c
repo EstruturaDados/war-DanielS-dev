@@ -16,11 +16,25 @@
 
 // Inclusão das bibliotecas padrão necessárias para entrada/saída, alocação de memória, manipulação de strings e tempo.
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+
 // --- Constantes Globais ---
 // Definem valores fixos para o número de territórios, missões e tamanho máximo de strings, facilitando a manutenção.
+#define MAX_TERRITORIO 5
+#define MAX_NOME 30
+#define MAX_COR 10
 
 // --- Estrutura de Dados ---
 // Define a estrutura para um território, contendo seu nome, a cor do exército que o domina e o número de tropas.
+
+struct Territorio {
+    char nome[MAX_NOME], cor[MAX_COR];
+    int quantidadeDeTropas;
+};
+
 
 // --- Protótipos das Funções ---
 // Declarações antecipadas de todas as funções que serão usadas no programa, organizadas por categoria.
@@ -29,9 +43,49 @@
 // Funções de lógica principal do jogo:
 // Função utilitária:
 
+void limparBuffer(){
+    int c;
+    while (c = getchar() != '\n' && c != EOF);
+}
+
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
 int main() {
+    setlocale(LC_ALL, "");
+
+    struct Territorio territorios[MAX_TERRITORIO];
+
+    for (int i = 0; i < MAX_TERRITORIO; i++){
+        printf("Cadastro do Territorio de N %d!\n\n", i);
+        printf("Digite o nome do Territorio: ");
+        fgets(territorios[i].nome, MAX_NOME, stdin);
+
+        printf("Digite a cor do Territorio: ");
+        fgets(territorios[i].cor, MAX_COR, stdin);
+
+        printf("Digite a quantidade de tropas do Territorio: ");
+
+        while (scanf("%d", &territorios[i].quantidadeDeTropas) != 1 || territorios[i].quantidadeDeTropas == 0){
+            limparBuffer();
+            if(territorios[i].quantidadeDeTropas == 0)
+                printf("\nA quantidade de Tropas não pode ser 0!\n");
+            else
+                printf("\nEntrada Inválida! Digite apenas números.\n");
+            printf("Digite novamente a quantidade de Tropas do territorio: ");
+        }
+
+        limparBuffer();
+
+    };
+
+    for (int i = 0; i < MAX_TERRITORIO; i++){
+        printf("=== DADOS DO TERRITORIO DE NÚMERO %d!\n", i);
+        printf("Nome do Territorio: %s\n", territorios[i].nome);
+        printf("Cor do Territorio %s\n", territorios[i].cor);
+        printf("Quantidade de Tropas %d\n\n", territorios[i].quantidadeDeTropas);
+    };
+
+    system("pause");
     // 1. Configuração Inicial (Setup):
     // - Define o locale para português.
     // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
