@@ -20,20 +20,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <time.h>
 
 // --- Constantes Globais ---
 // Definem valores fixos para o número de territórios, missões e tamanho máximo de strings, facilitando a manutenção.
-#define MAX_TERRITORIO 5
+#define MAX_TERRITORIO 3
 #define MAX_NOME 30
 #define MAX_COR 10
 
 // --- Estrutura de Dados ---
 // Define a estrutura para um território, contendo seu nome, a cor do exército que o domina e o número de tropas.
 
-struct Territorio {
+typedef struct  {
     char nome[MAX_NOME], cor[MAX_COR];
     int quantidadeDeTropas;
-};
+}Territorio;
 
 
 // --- Protótipos das Funções ---
@@ -41,6 +42,25 @@ struct Territorio {
 // Funções de setup e gerenciamento de memória:
 // Funções de interface com o usuário:
 // Funções de lógica principal do jogo:
+void ataque(Territorio* atacante, Territorio* defensor){
+    int dadoA, dadoD;
+    srand(time(NULL));
+    dadoA = 1 + rand() % 6;
+    dadoD = 1 + rand() % 6;
+
+    printf("O atacante %s rolou um dado e tirou %d.\n", atacante->nome, dadoA);
+    printf("O defensor %s rolou um dado e tirou %d.", defensor->nome, dadoD);
+
+    if (dadoA > dadoD){
+        defensor->quantidadeDeTropas -= 1;
+        printf("O ataquente venceu! o defensor perdeu 1 tropa!!\n");
+    } else if (dadoA < dadoD){
+        atacante->quantidadeDeTropas -= 1;
+        printf("O defensor venceu! o atacante perdeu 1 tropa!!\n");
+    }else {
+        printf("Empate!!!\n");
+    }
+}
 // Função utilitária:
 
 void limparBuffer(){
@@ -53,7 +73,7 @@ void limparBuffer(){
 int main() {
     setlocale(LC_ALL, "");
 
-    struct Territorio territorios[MAX_TERRITORIO];
+    Territorio* territorios = calloc(MAX_TERRITORIO, sizeof(Territorio));
 
     for (int i = 0; i < MAX_TERRITORIO; i++){
         printf("Cadastro do Territorio de N %d!\n\n", i);
@@ -78,32 +98,48 @@ int main() {
 
     };
 
-    for (int i = 0; i < MAX_TERRITORIO; i++){
-        printf("=== DADOS DO TERRITORIO DE NÚMERO %d!\n", i);
-        printf("Nome do Territorio: %s\n", territorios[i].nome);
-        printf("Cor do Territorio %s\n", territorios[i].cor);
-        printf("Quantidade de Tropas %d\n\n", territorios[i].quantidadeDeTropas);
-    };
+    int opcao = 0;
+
+    do
+    {
+        printf("Segue os territorios cadastrados!\n");
+
+        for (int i = 0; i < MAX_TERRITORIO; i++){
+            printf("%d, %s (Exercico %s, Tropas: %d)\n", i+1, territorios[i].nome, territorios[i].cor, territorios[i].quantidadeDeTropas);
+        }
+
+        int atacante = 0;
+        int defensor = 0;
+
+        printf("Fase de ataque.\n");
+        printf("Escolha o lado atacante (1 a %d): ", MAX_TERRITORIO);
+
+        while (scanf("%d", &atacante) != 1 || atacante < 1 || atacante > MAX_TERRITORIO) {
+            limparBuffer();
+            printf("Escolha um valor valido!\n");
+            printf("Digite o número do atacante novamente: ");
+        }
+
+        limparBuffer();
+
+        printf("Escolha o lado defensor (1 a %d): ", MAX_TERRITORIO);
+
+        while (scanf("%d", &defensor) != 1 || defensor < 1 || defensor > MAX_TERRITORIO || defensor == atacante) {
+            limparBuffer();
+            printf("Escolha um valor valido!\n");
+            printf("Digite o número do defensor novamente: ");
+        }
+
+        limparBuffer();
+
+        ataque(&territorios[atacante - 1], &territorios[defensor - 1]);
+        
+
+    } while (opcao != 0);
+    
+    free(territorios);
 
     system("pause");
-    // 1. Configuração Inicial (Setup):
-    // - Define o locale para português.
-    // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
-    // - Aloca a memória para o mapa do mundo e verifica se a alocação foi bem-sucedida.
-    // - Preenche os territórios com seus dados iniciais (tropas, donos, etc.).
-    // - Define a cor do jogador e sorteia sua missão secreta.
-
-    // 2. Laço Principal do Jogo (Game Loop):
-    // - Roda em um loop 'do-while' que continua até o jogador sair (opção 0) ou vencer.
-    // - A cada iteração, exibe o mapa, a missão e o menu de ações.
-    // - Lê a escolha do jogador e usa um 'switch' para chamar a função apropriada:
-    //   - Opção 1: Inicia a fase de ataque.
-    //   - Opção 2: Verifica se a condição de vitória foi alcançada e informa o jogador.
-    //   - Opção 0: Encerra o jogo.
-    // - Pausa a execução para que o jogador possa ler os resultados antes da próxima rodada.
-
-    // 3. Limpeza:
-    // - Ao final do jogo, libera a memória alocada para o mapa para evitar vazamentos de memória.
 
     return 0;
 }
